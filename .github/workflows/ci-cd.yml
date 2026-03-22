@@ -1,15 +1,14 @@
-name: Node.js CI/CD and Security Scan
+name: Node.js CI-CD-CS Pipeline
 
 on:
   push:
-    branches: [ "develop", "main" ]
+    branches: [ "main", "develop", "feature/*" ]
   pull_request:
-    branches: [ "develop", "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
-  build-and-test:
+  pipeline:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15
@@ -26,29 +25,34 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: npm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    # --- TAHAP CS (Continuous Security) ---
-    - name: Security Scan (npm audit)
-      run: npm audit --audit-level=high
+      - name: Install Dependencies
+        run: npm install
 
-    - name: Static Analysis (SAST)
-      uses: ajinabraham/njsscan-action@v0.0.3
-      with:
-        args: '.'
+      # --- TAHAP 1: CS (Continuous Security) ---
+      - name: Security Audit (npm audit)
+        run: npm audit --audit-level=high
 
-    # --- TAHAP CI (Continuous Integration) ---
-    - name: Run Unit Tests
-      env:
-        DATABASE_URL: postgresql://user:password@localhost:5432/library_db
-        PORT: 3000
-      run: npm test
+      - name: Static Analysis (njsscan)
+        uses: ajinabraham/njsscan-action@v0.0.3
+        with:
+          args: '.'
+
+      # --- TAHAP 2: CI (Continuous Integration) ---
+      - name: Run Unit Tests
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5432/library_db
+          PORT: 3000
+        run: npm test
+
+      # --- TAHAP 3: CD (Continuous Deployment - Simulation) ---
+      - name: Build Docker Image
+        run: docker build -t library-api:latest .
