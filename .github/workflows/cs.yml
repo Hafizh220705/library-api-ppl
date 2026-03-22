@@ -14,6 +14,6 @@ jobs:
       - name: Audit Dependencies
         run: npm audit --audit-level=high
       - name: Static Analysis (njsscan)
-        uses: ajinabraham/njsscan-action@v0.0.3
+        uses: ajinabraham/njsscan-action@master
         with:
           args: '.'
