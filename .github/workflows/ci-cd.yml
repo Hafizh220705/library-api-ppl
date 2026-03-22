@@ -1,0 +1,54 @@
+name: Node.js CI/CD and Security Scan
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Kita butuh database postgres juga di server GitHub buat ngetes
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: library_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    # --- TAHAP CS (Continuous Security) ---
+    - name: Run Security Scan (npm audit)
+      run: npm audit --audit-level=high
+
+    # --- TAHAP CI (Continuous Integration) ---
+    - name: Run Unit Tests
+      env:
+        DATABASE_URL: postgresql://user:password@localhost:5432/library_db
+        PORT: 3000
+      run: |
+        # Jalankan app di background sebentar untuk di-tes
+        npm start & 
+        sleep 5
+        npm test
