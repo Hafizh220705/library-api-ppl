@@ -1,11 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
+const bookRoutes = require('./routes/bookRoutes');
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use('/api/books', bookRoutes);
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
