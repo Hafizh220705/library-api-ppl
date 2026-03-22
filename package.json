@@ -16,5 +16,10 @@
     "url": "https://github.com/Hafizh220705/library-api-ppl/issues"
   },
   "homepage": "https://github.com/Hafizh220705/library-api-ppl#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  }
 }
