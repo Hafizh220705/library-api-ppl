@@ -42,6 +42,37 @@ const bookController = {
         error: error.message
       });
     }
+  },
+
+  updateBook: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { title, author, isbn, published_year } = req.body;
+      const updatedBook = await Book.update(id, title, author, isbn, published_year);
+      
+      if (!updatedBook) {
+        return res.status(404).json({ status: 'fail', message: 'Buku tidak ditemukan' });
+      }
+
+      res.status(200).json({ status: 'success', data: updatedBook });
+    } catch (error) {
+      res.status(500).json({ status: 'error', error: error.message });
+    }
+  },
+
+  deleteBook: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedBook = await Book.delete(id);
+
+      if (!deletedBook) {
+        return res.status(404).json({ status: 'fail', message: 'Buku tidak ditemukan' });
+      }
+
+      res.status(200).json({ status: 'success', message: 'Buku berhasil dihapus' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', error: error.message });
+    }
   }
 };
 
