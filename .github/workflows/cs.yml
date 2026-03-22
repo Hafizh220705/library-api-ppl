@@ -1,0 +1,19 @@
+name: Continuous Security (CS)
+
+on: [push, pull_request]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Audit Dependencies
+        run: npm audit --audit-level=high
+      - name: Static Analysis (njsscan)
+        uses: ajinabraham/njsscan-action@v0.0.3
+        with:
+          args: '.'
