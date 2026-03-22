@@ -16,10 +16,7 @@ app.use(express.json());
 
 const initializeDatabase = async () => {
   try {
-    const client = await pool.connect();
-    console.log('Berhasil terhubung ke PostgreSQL!');
-    
-    await client.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS books (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
@@ -29,11 +26,9 @@ const initializeDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    
-    console.log('Tabel "books" siap digunakan.');
-    client.release();
+    console.log('Berhasil terhubung ke PostgreSQL & Tabel "books" siap.');
   } catch (err) {
-    console.error('Gagal koneksi atau inisialisasi database:', err.message);
+    console.error('Gagal inisialisasi database:', err.message);
     if (process.env.NODE_ENV !== 'test') {
       process.exit(1);
     }

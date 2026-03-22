@@ -4,6 +4,9 @@ const app = require('../src/index');
 let bookId;
 
 describe('Full CRUD API Integration Test', () => {
+  beforeAll(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  });
 
   it('POST /api/books - Harus bisa nambah buku baru', async () => {
     const res = await request(app)
@@ -14,6 +17,8 @@ describe('Full CRUD API Integration Test', () => {
         isbn: "978-979-3062-79-1",
         published_year: 2005
       });
+
+    if (res.statusCode === 500) console.log("Detail Error:", res.body);
     
     expect(res.statusCode).toBe(201);
     expect(res.body.data).toHaveProperty('id');
